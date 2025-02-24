@@ -1,49 +1,39 @@
-# Gitignore for LobeHub
-################################################################
-
-# general
-.DS_Store
-.idea
-.vscode
-.history
-.temp
-.env.local
-venv
-temp
-tmp
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-node_modules
-*.log
-*.lock
-package-lock.json
+/node_modules
+/.pnp
+.pnp.js
 
-# ci
-coverage
-.coverage
-.eslintcache
-.stylelintcache
+# testing
+/coverage
+
+# database
+/prisma/db.sqlite
+/prisma/db.sqlite-journal
+db.sqlite
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
 
 # production
-dist
-es
-lib
-logs
-test-output
-
-# umi
-.umi
-.umi-production
-.umi-test
-.dumi/tmp*
-
-# husky
-.husky/prepare-commit-msg
+/build
 
 # misc
-# add other ignore file below
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
 # local env files
+# do not commit any .env files to git, except for the .env.example file. https://create.t3.gg/en/usage/env-variables#using-environment-variables
+.env
 .env*.local
 
 # vercel
@@ -51,13 +41,6 @@ test-output
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
-.next
-.env
-public/*.js
-bun.lockb
-sitemap*.xml
-robots.txt
 
-*.patch
-*.pdf
+# idea files
+.idea
