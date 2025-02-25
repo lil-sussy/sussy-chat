@@ -11,7 +11,7 @@ import {
 } from "@/chat/components/ui/card";
 import { ScrollArea } from "@/chat/components/ui/scroll-area";
 import { Textarea } from "@/chat/components/ui/textarea";
-import { ChatSidebar } from "@/chat/components/ChatSidebar";
+import { ChatSidebar } from "@/chat/components/ChatSidebar/ChatSidebar";
 import { ModelSelector } from "@/chat/components/ModelSelector";
 import { ChatMessage } from "@/chat/components/ChatMessage";
 import { AISettingsSidebar } from "@/chat/components/AiSettingsSidebar";
