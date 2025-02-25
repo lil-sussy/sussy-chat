@@ -68,6 +68,14 @@
   }
 }
 
+h3.ant-typography {
+  margin: 0!important;
+}
+
+.text-white.ant-typography {
+  color: #fff;
+}
+
 @layer base {
   * {
     @apply border-border;

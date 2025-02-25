@@ -18,6 +18,8 @@ export default function App() {
   }
 
   return (
-    <ChatContainer />
+    <div className="w-full h-full pt-16">
+      <ChatContainer />
+    </div>
   );
 }

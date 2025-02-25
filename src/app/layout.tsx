@@ -5,7 +5,6 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { ConfigProvider } from "antd";
-import "antd/dist/reset.css";
 import "@radix-ui/themes/styles.css";
 import { SessionProvider } from "next-auth/react";
 
@@ -28,6 +27,9 @@ export default function RootLayout({
                 components: {
                   Button: {
                     colorPrimary: "#000",
+                  },
+                  Typography: {
+                    colorText: "unset",
                   },
                 },
                 hashed: false,
