@@ -13,7 +13,7 @@ import { ScrollArea } from "@/chat/components/ui/scroll-area";
 import { Textarea } from "@/chat/components/ui/textarea";
 import { ChatSidebar } from "@/chat/components/ChatSidebar/ChatSidebar";
 import { ModelSelector } from "@/chat/components/ModelSelector";
-import { ChatMessage } from "@/chat/components/ChatMessage";
+import { ChatMessageContainer } from "@/chat/components/ChatMessage/ChatMessageContainer";
 import { AISettingsSidebar } from "@/chat/components/AiSettingsSidebar/AiSettingsSidebar";
 import { ChatProvider } from "../contexts/ChatContext";
 import ChatContainer from "./ChatContainer";

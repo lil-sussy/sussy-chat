@@ -9,6 +9,8 @@ interface ChatInputProps {
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
   keyFocus?: boolean;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -16,6 +18,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onChange,
   onSubmit,
   keyFocus = false,
+  onKeyDown,
+  placeholder = "Type your message... (Shift+Enter for new line)",
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const isExpanded = value.length > 50 || value.includes("\n");
@@ -46,13 +50,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   }, [keyFocus]);
 
   // Handle Shift+Enter for new line
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDownInternal = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (value.trim()) {
         onSubmit(e as unknown as React.FormEvent);
       }
     }
+    
+    // Pass to external handler if provided
+    onKeyDown?.(e);
   };
 
   return (
@@ -62,9 +69,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           ref={inputRef}
           value={value}
           onChange={onChange}
-          placeholder="Type your message... (Shift+Enter for new line)"
+          placeholder={placeholder}
           autoSize={{ minRows: isExpanded ? 3 : 1, maxRows: 6 }}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleKeyDownInternal}
           className="mb-2"
         />
         <div className="flex justify-end">

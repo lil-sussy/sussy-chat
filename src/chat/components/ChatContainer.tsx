@@ -1,6 +1,6 @@
 import { Message, useChat } from "../contexts/ChatContext";
 import { Card } from "antd";
-import { ChatMessage } from "@/chat/components/ChatMessage";
+import { ChatMessageContainer } from "@/chat/components/ChatMessage/ChatMessageContainer";
 import { ChatInput } from "@/chat/components/ChatInput";
 import { ChangeEvent } from "react";
 
@@ -26,7 +26,7 @@ export default function ChatContainer() {
     >
       <div className="flex-1 overflow-auto mb-4 pr-2">
         {messages.map((message: Message) => (
-          <ChatMessage
+          <ChatMessageContainer
             key={message.id}
             id={message.id}
             content={message.content}
