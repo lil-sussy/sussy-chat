@@ -3,16 +3,18 @@
 import { useSession } from "next-auth/react";
 import ChatContainer from "@/chat/components/ChatContainer";
 import Header from "@/app/_components/Header";
+import LoginCard from "./_components/LoginCard";
+import { Spin } from "antd";
 
 export default function App() {
   const { data, status, update } = useSession();
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   if (status === "unauthenticated") {
-    return <div>Unauthenticated</div>;
+    return <LoginCard />;
   }
 
   return (

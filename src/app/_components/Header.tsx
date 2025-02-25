@@ -40,7 +40,7 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <AntHeader className="flex min-w-screen w-screen items-center justify-between bg-white/40 backdrop-blur-sm px-6">
+    <AntHeader className="flex min-w-screen w-screen items-center justify-between bg-white/40 backdrop-blur-sm px-6 fixed top-0 left-0 right-0 z-50">
       <div className="flex items-center">
         <Title level={3} className="m-0 mb-[0!important] text-white">
           Sussy Chat
