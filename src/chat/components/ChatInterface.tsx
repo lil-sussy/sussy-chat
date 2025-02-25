@@ -27,7 +27,7 @@ export default function ChatInterface() {
         <ChatSidebar />
         <div className="flex flex-1 flex-col">
           <div className="flex items-center justify-between border-b border-gray-200 p-4">
-            <CardTitle>Chat Interface</CardTitle>
+            {/* <CardTitle>Chat Interface</CardTitle> */}
             <ModelSelector />
           </div>
           <div className="flex-1 overflow-auto p-4">

@@ -1,23 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/chat/lib/utils";
-import { Button } from "@/chat/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/chat/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/chat/components/ui/popover";
+import { useState, useEffect } from "react";
 import { useChat } from "../contexts/ChatContext";
+import { Select, Tag, Space } from "antd";
+import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
 
 const models = [
   { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
@@ -27,53 +13,79 @@ const models = [
 ];
 
 export function ModelSelector() {
+  // Get the setSelectedModel from context but support multiple models
   const { setSelectedModel } = useChat();
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+
+  // Update selected models and notify context
+  const handleModelChange = (values: string[]) => {
+    setSelectedModels(values);
+    // If supporting multiple models in the future, pass the array
+    // For now, use the first selected model or empty string
+    setSelectedModel(values.length > 0 ? values[0]?? "" : "");
+  };
+
+  // Handle removing a tag
+  const handleRemoveModel = (modelValue: string) => {
+    const newSelectedModels = selectedModels.filter(value => value !== modelValue);
+    setSelectedModels(newSelectedModels);
+    setSelectedModel(newSelectedModels.length > 0 ? newSelectedModels[0]?? "" : "");
+  };
+
+  // Custom render for the tags
+  const tagRender = (props: any) => {
+    const { value, closable, onClose } = props;
+    const model = models.find(m => m.value === value);
+    
+    return (
+      <Tag
+        color="blue"
+        closable={closable}
+        onClose={onClose}
+        style={{ marginRight: 3, display: 'flex', alignItems: 'center' }}
+      >
+        {model?.label || value}
+      </Tag>
+    );
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between text-primary"
-        >
-          {value
-            ? models.find((model) => model.value === value)?.label
-            : "Select model..."}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search model..." />
-          <CommandList>
-            <CommandEmpty>No model found.</CommandEmpty>
-            <CommandGroup>
-              {models.map((model) => (
-                <CommandItem
-                  key={model.value}
-                  onSelect={(currentValue: string) => {
-                    setValue(currentValue === value ? "" : currentValue);
-                    setSelectedModel(currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === model.value ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  {model.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <div className="w-full">
+      {/* Model dropdown with search */}
+      <Select
+        mode="multiple"
+        className="min-w-full"
+        placeholder="Select models..."
+        value={selectedModels}
+        onChange={handleModelChange}
+        optionFilterProp="children"
+        filterOption={(input, option) => 
+          (option?.label?.toString().toLowerCase() || '').includes(input.toLowerCase())
+        }
+        options={models}
+        maxTagCount={3}
+        tagRender={tagRender}
+        suffixIcon={<SearchOutlined />}
+        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+        showSearch
+      />
+      
+      {/* Alternatively, show selected models as separate tags outside the Select */}
+      {/* <Space wrap style={{ display: selectedModels.length ? 'flex' : 'none' }}>
+        {selectedModels.map(modelValue => {
+          const model = models.find(m => m.value === modelValue);
+          return (
+            <Tag 
+              key={modelValue} 
+              color="blue"
+              closable
+              onClose={() => handleRemoveModel(modelValue)}
+            >
+              {model?.label || modelValue}
+            </Tag>
+          );
+        })}
+      </Space> */}
+    </div>
   );
 }
