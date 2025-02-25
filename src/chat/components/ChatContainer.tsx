@@ -1,11 +1,8 @@
 import { Message, useChat } from "../contexts/ChatContext";
-import { Card, CardContent, CardFooter } from "@/chat/components/ui/card";
-import { ScrollArea } from "@/chat/components/ui/scroll-area";
-import { Textarea } from "@/chat/components/ui/textarea";
-import { Button } from "@/chat/components/ui/button";
-import { Input } from "@/chat/components/ui/input";
+import { Card } from "antd";
 import { ChatMessage } from "@/chat/components/ChatMessage";
-import { useState, ChangeEventHandler } from "react";
+import { ChatInput } from "@/chat/components/ChatInput";
+import { ChangeEvent } from "react";
 
 export default function ChatContainer() {
   const {
@@ -15,55 +12,38 @@ export default function ChatContainer() {
     handleSubmit,
     handleEditMessage,
   } = useChat();
-  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Create a wrapper function to handle the type mismatch
+  const handleTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    // The actual value we care about is the same in both event types
+    handleInputChange(e as unknown as ChangeEvent<HTMLInputElement>);
+  };
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardContent className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          {messages.map((message: Message) => (
-            <ChatMessage
-              key={message.id}
-              id={message.id}
-              content={message.content}
-              role={message.role as "user" | "assistant"}
-              onEdit={handleEditMessage}
-            />
-          ))}
-        </ScrollArea>
-      </CardContent>
-      <CardFooter>
-        <form onSubmit={handleSubmit} className="w-full">
-          {isExpanded ? (
-            <Textarea
-              value={input}
-              onChange={
-                handleInputChange as unknown as ChangeEventHandler<HTMLTextAreaElement>
-              }
-              placeholder="Type your message..."
-              className="mb-2 w-full"
-              rows={4}
-            />
-          ) : (
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Type your message..."
-              className="mb-2 w-full"
-            />
-          )}
-          <div className="flex items-center justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsExpanded(!isExpanded)}
-            >
-              {isExpanded ? "Collapse" : "Expand"}
-            </Button>
-            <Button type="submit">Send</Button>
-          </div>
-        </form>
-      </CardFooter>
+    <Card 
+      className="flex h-full flex-col" 
+      bodyStyle={{ height: 'calc(100% - 57px)', padding: '12px', display: 'flex', flexDirection: 'column' }}
+    >
+      <div className="flex-1 overflow-auto mb-4 pr-2">
+        {messages.map((message: Message) => (
+          <ChatMessage
+            key={message.id}
+            id={message.id}
+            content={message.content}
+            role={message.role as "user" | "assistant"}
+            onEdit={handleEditMessage}
+          />
+        ))}
+      </div>
+      
+      <div className="mt-auto">
+        <ChatInput
+          value={input}
+          onChange={handleTextAreaChange}
+          onSubmit={handleSubmit}
+          keyFocus={true}
+        />
+      </div>
     </Card>
   );
 }
