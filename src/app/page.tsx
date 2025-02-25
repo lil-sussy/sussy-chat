@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { auth } from "@/server/auth";
 import { api, HydrateClient } from "@/trpc/server";
-import ChatContainer from "@/chat/components/ChatContainer";
+import ChatContainer from "@/chat/components/ChatInterface";
 import Header from "@/app/_components/Header";
 import { useSession } from "next-auth/react";
 import App from "./App";

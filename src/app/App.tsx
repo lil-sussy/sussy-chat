@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import ChatContainer from "@/chat/components/ChatContainer";
+import ChatContainer from "@/chat/components/ChatInterface";
 import Header from "@/app/_components/Header";
 import LoginCard from "./_components/LoginCard";
 import { Spin } from "antd";

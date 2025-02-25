@@ -6,6 +6,7 @@ import { Button } from "@/chat/components/ui/button";
 import { Label } from "@/chat/components/ui/label";
 import { Slider } from "@/chat/components/ui/slider";
 import { ScrollArea } from "@/chat/components/ui/scroll-area";
+import { useChat } from "../contexts/ChatContext";
 
 const systemPrompts = [
   { id: "1", name: "Default", prompt: "You are a helpful assistant." },
@@ -35,20 +36,10 @@ const systemPrompts = [
   },
 ];
 
-type AISettingsProps = {
-  onSystemPromptChange: (prompt: string) => void;
-  onTemperatureChange: (temp: number) => void;
-  onMaxTokensChange: (tokens: number) => void;
-};
 
-export function AISettingsSidebar({
-  onSystemPromptChange,
-  onTemperatureChange,
-  onMaxTokensChange,
-}: AISettingsProps) {
+export function AISettingsSidebar() {
+  const { setSystemPrompt, temperature, setTemperature, maxTokens, setMaxTokens } = useChat();
   const [searchTerm, setSearchTerm] = useState("");
-  const [temperature, setTemperature] = useState(0.7);
-  const [maxTokens, setMaxTokens] = useState(5000);
 
   const filteredPrompts = systemPrompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -75,7 +66,7 @@ export function AISettingsSidebar({
             key={prompt.id}
             variant="ghost"
             className="mb-2 w-full justify-start text-left text-primary"
-            onClick={() => onSystemPromptChange(prompt.prompt)}
+            onClick={() => setSystemPrompt(prompt.prompt)}
           >
             {prompt.name}
           </Button>
@@ -93,7 +84,6 @@ export function AISettingsSidebar({
             value={[temperature]}
             onValueChange={(value: number[]) => {
               setTemperature(value[0] ?? 0);
-              onTemperatureChange(value[0] ?? 0);
             }}
           />
         </div>
@@ -108,7 +98,6 @@ export function AISettingsSidebar({
             value={[maxTokens]}
             onValueChange={(value: number[]) => {
               setMaxTokens(value[0] ?? 0);
-              onMaxTokensChange(value[0] ?? 0);
             }}
           />
         </div>
