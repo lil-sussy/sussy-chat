@@ -17,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/chat/components/ui/popover";
+import { useChat } from "../contexts/ChatContext";
 
 const models = [
   { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
@@ -25,11 +26,8 @@ const models = [
   { value: "palm-2", label: "PaLM 2" },
 ];
 
-export function ModelSelector({
-  onSelectModel,
-}: {
-  onSelectModel: (value: string) => void;
-}) {
+export function ModelSelector() {
+  const { setSelectedModel } = useChat();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
 
@@ -59,7 +57,7 @@ export function ModelSelector({
                   key={model.value}
                   onSelect={(currentValue: string) => {
                     setValue(currentValue === value ? "" : currentValue);
-                    onSelectModel(currentValue);
+                    setSelectedModel(currentValue);
                     setOpen(false);
                   }}
                 >
