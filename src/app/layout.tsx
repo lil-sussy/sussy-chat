@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
 import "@radix-ui/themes/styles.css";
+import { SessionProvider } from "next-auth/react";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
         <TRPCReactProvider>
+          <SessionProvider>
             <ConfigProvider
               theme={{
                 components: {
@@ -32,6 +34,7 @@ export default function RootLayout({
             >
               {children}
             </ConfigProvider>
+          </SessionProvider>
         </TRPCReactProvider>
       </body>
     </html>
