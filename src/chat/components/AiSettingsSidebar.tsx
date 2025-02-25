@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@/features/chat/components/ui/input";
-import { Button } from "@/features/chat/components/ui/button";
-import { Label } from "@/features/chat/components/ui/label";
-import { Slider } from "@/features/chat/components/ui/slider";
-import { ScrollArea } from "@/features/chat/components/ui/scroll-area";
+import { Input } from "@/chat/components/ui/input";
+import { Button } from "@/chat/components/ui/button";
+import { Label } from "@/chat/components/ui/label";
+import { Slider } from "@/chat/components/ui/slider";
+import { ScrollArea } from "@/chat/components/ui/scroll-area";
 
 const systemPrompts = [
   { id: "1", name: "Default", prompt: "You are a helpful assistant." },

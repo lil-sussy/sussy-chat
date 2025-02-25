@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/features/chat/lib/utils";
-import { Button } from "@/features/chat/components/ui/button";
+import { cn } from "@/chat/lib/utils";
+import { Button } from "@/chat/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -11,12 +11,12 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/features/chat/components/ui/command";
+} from "@/chat/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/features/chat/components/ui/popover";
+} from "@/chat/components/ui/popover";
 
 const models = [
   { value: "gpt-4-turbo", label: "GPT-4 Turbo" },

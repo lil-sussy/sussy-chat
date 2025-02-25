@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Avatar } from "@/features/chat/components/ui/avatar";
-import { Button } from "@/features/chat/components/ui/button";
-import { Input } from "@/features/chat/components/ui/input";
+import { Avatar } from "@/chat/components/ui/avatar";
+import { Button } from "@/chat/components/ui/button";
+import { Input } from "@/chat/components/ui/input";
 import { ChevronDown, ChevronUp, Edit, Save } from "lucide-react";
 
 type ChatMessageProps = {

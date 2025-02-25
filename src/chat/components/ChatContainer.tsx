@@ -1,17 +1,17 @@
 "use client";
 
 import { ChangeEventHandler, useState } from "react";
-import { Button } from "@/features/chat/components/ui/button";
-import { Input } from "@/features/chat/components/ui/input";
-import { Card, CardContent, CardFooter, CardTitle } from "@/features/chat/components/ui/card";
-import { ScrollArea } from "@/features/chat/components/ui/scroll-area";
-import { Textarea } from "@/features/chat/components/ui/textarea";
-import { ChatSidebar } from "@/features/chat/components/ChatSidebar";
-import { ModelSelector } from "@/features/chat/components/ModelSelector";
-import { ChatMessage } from "@/features/chat/components/ChatMessage";
-import { AISettingsSidebar } from "@/features/chat/components/AiSettingsSidebar";
-import { useChat } from "@/features/chat/hooks/useChat";
-import { Message } from "@/features/chat/hooks/useChat";
+import { Button } from "@/chat/components/ui/button";
+import { Input } from "@/chat/components/ui/input";
+import { Card, CardContent, CardFooter, CardTitle } from "@/chat/components/ui/card";
+import { ScrollArea } from "@/chat/components/ui/scroll-area";
+import { Textarea } from "@/chat/components/ui/textarea";
+import { ChatSidebar } from "@/chat/components/ChatSidebar";
+import { ModelSelector } from "@/chat/components/ModelSelector";
+import { ChatMessage } from "@/chat/components/ChatMessage";
+import { AISettingsSidebar } from "@/chat/components/AiSettingsSidebar";
+import { useChat } from "@/chat/hooks/useChat";
+import { Message } from "@/chat/hooks/useChat";
 
 type ChatHistoryItem = {
   id: string;
@@ -97,7 +97,7 @@ export default function ChatInterface() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex bg-gray-100">
       <ChatSidebar
         chatHistory={chatHistory}
         onSelectChat={handleSelectChat}

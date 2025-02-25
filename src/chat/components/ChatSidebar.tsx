@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import { cn } from "@/features/chat/lib/utils";
+import { cn } from "@/chat/lib/utils";
 
 type ChatHistoryItem = {
   id: string;
