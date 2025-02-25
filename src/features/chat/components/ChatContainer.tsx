@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEventHandler, useState } from "react";
 import { Button } from "@/features/chat/components/ui/button";
 import { Input } from "@/features/chat/components/ui/input";
 import { Card, CardContent, CardFooter, CardTitle } from "@/features/chat/components/ui/card";
@@ -16,7 +16,7 @@ import { Message } from "@/features/chat/hooks/useChat";
 type ChatHistoryItem = {
   id: string;
   title: string;
-  messages: { id: string; content: string; role: "user" | "assistant" }[];
+  messages: Message[];
 };
 
 const dummyChats: ChatHistoryItem[] = [
@@ -84,7 +84,7 @@ export default function ChatInterface() {
   };
 
   const handleEditMessage = (id: string, newContent: string) => {
-    const updatedMessages = messages.map((msg: { id: string; content: string }) =>
+    const updatedMessages = messages.map((msg: Message) =>
       msg.id === id ? { ...msg, content: newContent } : msg,
     );
     setMessages(updatedMessages);
@@ -129,7 +129,7 @@ export default function ChatInterface() {
                 {isExpanded ? (
                   <Textarea
                     value={input}
-                    onChange={handleInputChange}
+                    onChange={handleInputChange as unknown as ChangeEventHandler<HTMLTextAreaElement>}
                     placeholder="Type your message..."
                     className="mb-2 w-full"
                     rows={4}

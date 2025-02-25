@@ -48,7 +48,7 @@ export function AISettingsSidebar({
 }: AISettingsProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [temperature, setTemperature] = useState(0.7);
-  const [maxTokens, setMaxTokens] = useState(150);
+  const [maxTokens, setMaxTokens] = useState(5000);
 
   const filteredPrompts = systemPrompts.filter((prompt) =>
     prompt.name.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -56,9 +56,11 @@ export function AISettingsSidebar({
 
   return (
     <div className="flex h-screen w-64 flex-col border-l border-gray-200 p-4">
-      <h2 className="mb-4 text-lg font-semibold">AI Settings</h2>
+      <h2 className="mb-4 text-lg font-semibold text-primary">AI Settings</h2>
 
-      <Label htmlFor="prompt-search">Search System Prompts</Label>
+      <Label htmlFor="prompt-search" className="my-2 text-primary">
+        Search System Prompts
+      </Label>
       <Input
         id="prompt-search"
         placeholder="Search prompts..."
@@ -72,7 +74,7 @@ export function AISettingsSidebar({
           <Button
             key={prompt.id}
             variant="ghost"
-            className="mb-2 w-full justify-start text-left"
+            className="mb-2 w-full justify-start text-left text-primary"
             onClick={() => onSystemPromptChange(prompt.prompt)}
           >
             {prompt.name}
@@ -82,7 +84,7 @@ export function AISettingsSidebar({
 
       <div className="space-y-4">
         <div>
-          <Label htmlFor="temperature">Temperature: {temperature}</Label>
+          <Label htmlFor="temperature" className="text-primary">Temperature: {temperature}</Label>
           <Slider
             id="temperature"
             min={0}
@@ -97,11 +99,11 @@ export function AISettingsSidebar({
         </div>
 
         <div>
-          <Label htmlFor="max-tokens">Max Tokens: {maxTokens}</Label>
+          <Label htmlFor="max-tokens" className="text-primary">Max Tokens: {maxTokens}</Label>
           <Slider
             id="max-tokens"
             min={50}
-            max={500}
+            max={10000}
             step={10}
             value={[maxTokens]}
             onValueChange={(value: number[]) => {

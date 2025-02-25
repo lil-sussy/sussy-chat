@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-interface Message {
-  id: number;
+export interface Message {
+  id: string;
   content: string;
   role: "user" | "assistant";
 }
@@ -30,7 +30,7 @@ export function useChat(id: string,
 
   const sendMessage = (text: string) => {
     const newMessage: Message = {
-      id: Date.now(),
+      id: Date.now().toString(),
       content: text,
       role: "user"
     };
@@ -48,7 +48,7 @@ export function useChat(id: string,
     // Add logic to create new chat
   };
 
-  const handleEditMessage = (id: number, newContent: string) => {
+  const handleEditMessage = (id: string, newContent: string) => {
     setMessages(prev =>
       prev.map(msg => 
         msg.id === id ? {...msg, content: newContent} : msg
@@ -58,10 +58,10 @@ export function useChat(id: string,
 
   const input = messages[messages.length - 1]?.content || "";
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessages(prev => [...prev, { id: Date.now(), content: e.target.value, role: "user" }]);
+    setMessages(prev => [...prev, { id: Date.now().toString(), content: e.target.value, role: "user" }]);
   };
   const handleSubmit = () => {
-    setMessages(prev => [...prev, { id: Date.now(), content: input, role: "user" }]);
+    setMessages(prev => [...prev, { id: Date.now().toString(), content: input, role: "user" }]);
   };
 
   return {
