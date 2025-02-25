@@ -30,6 +30,7 @@ export default function RootLayout({
                     colorPrimary: "#000",
                   },
                 },
+                hashed: false,
               }}
             >
               {children}
