@@ -45,7 +45,7 @@ export function ChatSidebar() {
   );
 
   return (
-    <div className="flex w-16 sm:w-64">
+    <div className="flex w-16 md:w-64">
       {/* Mobile toggle button */}
       {mobileToggle}
       
