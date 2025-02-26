@@ -39,6 +39,7 @@
     "@trpc/server": "^11.0.0-rc.446",
     "@types/date-fns": "^2.5.3",
     "antd": "^5.24.2",
+    "axios": "^1.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",

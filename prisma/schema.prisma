@@ -83,7 +83,6 @@ model Chat {
     messages       Message[]
     user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId         String
-
     @@index([userId])
 }
 
@@ -92,7 +91,7 @@ model Message {
     content     String    @db.Text
     createdAt   DateTime  @default(now())
     role        Role
-    
+    model       String
     // Tree structure relationships
     parentId    String?
     parent      Message?  @relation("MessageTree", fields: [parentId], references: [id], onDelete: SetNull)
