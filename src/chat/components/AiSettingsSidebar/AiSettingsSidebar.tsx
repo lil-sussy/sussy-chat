@@ -1,38 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Input, Button, Slider, Drawer, Typography, Space } from "antd";
-import { SettingOutlined, SearchOutlined } from "@ant-design/icons";
-import { useChat } from "../../contexts/ChatContext";
+import { useState } from "react";
+import { Button, Drawer } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
+import { useMediaQuery } from "react-responsive";
 import AiSettingsContent from "./AiSettingsContent";
 
-const { Title, Text } = Typography;
-
 export function AISettingsSidebar() {
-  const [searchTerm, setSearchTerm] = useState("");
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Check if we're on a mobile device
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    // Initial check
-    checkIfMobile();
-    
-    // Add event listener for window resize
-    window.addEventListener("resize", checkIfMobile);
-    
-    // Cleanup
-    return () => window.removeEventListener("resize", checkIfMobile);
-  }, []);
+  const isMobile = useMediaQuery({ query: '(max-width: 1023px)' });
 
   // For mobile: show a button that opens the drawer
   if (isMobile) {
     return (
-      <div className="flex w-16 md:w-64">
+      <div className="flex w-16 lg:w-64">
         <Button
           type="primary"
           shape="circle"
@@ -47,7 +28,6 @@ export function AISettingsSidebar() {
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
           width={300}
-          bodyStyle={{ padding: "12px" }}
         >
           <AiSettingsContent />
         </Drawer>
@@ -57,7 +37,7 @@ export function AISettingsSidebar() {
 
   // For desktop: show the sidebar
   return (
-    <div className="hidden md:flex w-64 flex-col border-l border-gray-200 p-4 bg-white">
+    <div className="hidden lg:flex w-64 flex-col border-l border-gray-200 p-4 bg-white">
       <AiSettingsContent />
     </div>
   );
