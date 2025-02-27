@@ -1,8 +1,9 @@
-import { Message, useChat } from "../contexts/ChatContext";
+import { useChat } from "../contexts/ChatContext";
 import { Card } from "antd";
 import { ChatMessageContainer } from "@/chat/components/ChatMessage/ChatMessageContainer";
 import { ChatInput } from "@/chat/components/ChatInput";
 import { ChangeEvent } from "react";
+import { Message } from "prisma/prisma-client";
 
 export default function ChatContainer() {
   const {

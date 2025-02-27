@@ -17,9 +17,17 @@ import { ChatMessageContainer } from "@/chat/components/ChatMessage/ChatMessageC
 import { AISettingsSidebar } from "@/chat/components/AiSettingsSidebar/AiSettingsSidebar";
 import { ChatProvider } from "../contexts/ChatContext";
 import ChatContainer from "./ChatContainer";
+import { useSession } from "next-auth/react";
+import { api } from "@/trpc/react";
+import { Spin } from "antd";
 
 export default function ChatInterface() {
+  const { data: session } = useSession();
 
+  if (!session) {
+    return <Spin />;
+  }
+  
 
   return (
     <ChatProvider>

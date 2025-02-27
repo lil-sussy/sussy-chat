@@ -1,10 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
-
-export interface Message {
-  id: string;
-  content: string;
-  role: "user" | "assistant";
-}
+import { api } from "@/trpc/react";
+import { Chat, Message } from "@prisma/client";
 
 interface ChatBody {
   model: string;
@@ -13,16 +9,10 @@ interface ChatBody {
   maxTokens: number;
 }
 
-export interface ChatHistoryItem {
-  id: string;
-  title: string;
-  messages: Message[];
-}
-
 interface ChatContextType {
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-  setChatHistory: React.Dispatch<React.SetStateAction<ChatHistoryItem[]>>;
+  setChatHistory: React.Dispatch<React.SetStateAction<Chat[]>>;
   selectedModel: string;
   setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
   systemPrompt: string;
@@ -31,7 +21,7 @@ interface ChatContextType {
   setTemperature: React.Dispatch<React.SetStateAction<number>>;
   maxTokens: number;
   setMaxTokens: React.Dispatch<React.SetStateAction<number>>;
-  chatHistory: ChatHistoryItem[];
+  chatHistory: Chat[];
   currentChatId: string | null;
   handleSelectChat: (id: string) => void;
   handleNewChat: () => void;
@@ -59,55 +49,32 @@ const defaultChatBody: ChatBody = {
   maxTokens: 5000,
 };
 
-const dummyChats: ChatHistoryItem[] = [
-  {
-    id: "1",
-    title: "Chat about AI",
-    messages: [
-      { id: "1", content: "What's the latest in AI?", role: "user" },
-      {
-        id: "2",
-        content:
-          "There have been significant advancements in large language models and generative AI recently.",
-        role: "assistant",
-      },
-    ],
-  },
-  {
-    id: "2",
-    title: "Coding help",
-    messages: [
-      { id: "1", content: "How do I use React hooks?", role: "user" },
-      {
-        id: "2",
-        content:
-          "React hooks are functions that let you use state and other React features in functional components. Some common hooks include useState, useEffect, and useContext.",
-        role: "assistant",
-      },
-    ],
-  },
-];
-
 export const ChatProvider: React.FC<ChatProviderProps> = ({
   children,
   initialChatBody = defaultChatBody,
   initialMessages = [],
 }) => {
-  const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>(dummyChats);
-  const [messages, setMessages] = useState<Message[]>(dummyChats[0]?.messages || []);
+  const { data: chats } = api.chat.getAll.useQuery();
+  const [chatHistory, setChatHistory] = useState<Chat[]>(chats || []);
+  const lastChat = chats? chats[chats.length - 1] : null;
+  const [messages, setMessages] = useState<Message[]>(lastChat?.messages || []);
   const [selectedModel, setSelectedModel] = useState<string>(initialChatBody.model);
   const [systemPrompt, setSystemPrompt] = useState<string>(initialChatBody.systemPrompt);
   const [temperature, setTemperature] = useState<number>(initialChatBody.temperature);
   const [maxTokens, setMaxTokens] = useState<number>(initialChatBody.maxTokens);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(dummyChats[0]?.id || null);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(lastChat?.id || null);
+  const newChatMutation = api.chat.create.useMutation();
 
-  const handleNewChat = () => {
+  const handleNewChat = async () => {
     const newChatId = String(chatHistory.length + 1);
+    const newChat = await newChatMutation.mutateAsync({
+      title: `New Chat ${newChatId}`,
+    });
     setChatHistory([
       ...chatHistory,
-      { id: newChatId, title: `New Chat ${newChatId}`, messages: [] },
+      newChat
     ]);
-    setCurrentChatId(newChatId);
+    setCurrentChatId(newChat.id);
   };
 
   const handleSelectChat = (id: string) => {
