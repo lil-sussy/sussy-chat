@@ -36,6 +36,13 @@ export const chatRouter = createTRPCRouter({
       const chatService = createChatService(ctx.db);
       return chatService.getChatById(input.chatId, ctx.session.user.id);
     }),
+  
+  getAllMessages: protectedProcedure
+    .input(z.object({ chatId: z.string() }))
+    .query(({ ctx, input }) => {
+      const chatService = createChatService(ctx.db);
+      return chatService.getAllMessagesFromChat(input.chatId);
+    }),
 
   // Generate message with a specific model
   generateWithModel: protectedProcedure

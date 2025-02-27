@@ -64,7 +64,6 @@ export function ChatSidebar() {
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
           width={280}
-          bodyStyle={{ padding: 0 }}
         >
           <SidebarContent />
         </Drawer>

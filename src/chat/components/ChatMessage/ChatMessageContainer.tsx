@@ -86,9 +86,7 @@ export const ChatMessageContainer: React.FC<ChatMessageProps> = ({
     >
       <div className={`max-w-[80%] ${role === 'user' ? 'ml-auto' : 'mr-auto'}`}>
         <Card 
-          bordered={false}
           className={`${role === 'assistant' ? 'bg-gray-50' : 'bg-blue-50'}`}
-          bodyStyle={{ padding: '12px' }}
         >
           <div className="flex items-start">
             {role === 'assistant' && <div className="mr-3 mt-1">{avatar}</div>}

@@ -47,6 +47,14 @@ export class ChatService {
     });
   }
 
+  async getAllMessagesFromChat(chatId: string) {
+    return this.prisma.message.findMany({
+      where: {
+        chatId,
+      },
+    });
+  }
+  
   async updateChatActiveMessage(chatId: string, messageId: string) {
     return this.prisma.chat.update({
       where: {

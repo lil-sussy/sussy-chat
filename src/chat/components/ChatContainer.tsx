@@ -23,10 +23,9 @@ export default function ChatContainer() {
   return (
     <Card 
       className="flex h-full flex-col" 
-      bodyStyle={{ height: 'calc(100% - 57px)', padding: '12px', display: 'flex', flexDirection: 'column' }}
     >
       <div className="flex-1 overflow-auto mb-4 pr-2">
-        {messages.map((message: Message) => (
+        {messages?.map((message: Message) => (
           <ChatMessageContainer
             key={message.id}
             id={message.id}
@@ -39,7 +38,7 @@ export default function ChatContainer() {
       
       <div className="mt-auto">
         <ChatInput
-          value={input}
+          value={input || ""}
           onChange={handleTextAreaChange}
           onSubmit={handleSubmit}
           keyFocus={true}

@@ -10,8 +10,7 @@ interface ChatBody {
 }
 
 interface ChatContextType {
-  messages: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  messages: Message[] | undefined;
   setChatHistory: React.Dispatch<React.SetStateAction<Chat[]>>;
   selectedModel: string;
   setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
@@ -27,7 +26,7 @@ interface ChatContextType {
   handleNewChat: () => void;
   handleEditMessage: (id: string, newContent: string) => void;
   sendMessage: (text: string) => void;
-  input: string;
+  input: string | undefined;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: () => void;
 }
@@ -57,13 +56,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   const { data: chats } = api.chat.getAll.useQuery();
   const [chatHistory, setChatHistory] = useState<Chat[]>(chats || []);
   const lastChat = chats? chats[chats.length - 1] : null;
-  const [messages, setMessages] = useState<Message[]>(lastChat?.messages || []);
   const [selectedModel, setSelectedModel] = useState<string>(initialChatBody.model);
   const [systemPrompt, setSystemPrompt] = useState<string>(initialChatBody.systemPrompt);
   const [temperature, setTemperature] = useState<number>(initialChatBody.temperature);
   const [maxTokens, setMaxTokens] = useState<number>(initialChatBody.maxTokens);
   const [currentChatId, setCurrentChatId] = useState<string | null>(lastChat?.id || null);
   const newChatMutation = api.chat.create.useMutation();
+  const { data: messages } = api.chat.getAllMessages.useQuery({
+    chatId: currentChatId || "",
+  });
 
   const handleNewChat = async () => {
     const newChatId = String(chatHistory.length + 1);
@@ -79,14 +80,12 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
 
   const handleSelectChat = (id: string) => {
     setCurrentChatId(id);
-    setMessages(chatHistory.find((chat) => chat.id === id)?.messages || []);
   };
 
   const handleEditMessage = (id: string, newContent: string) => {
-    const updatedMessages = messages.map((msg: Message) =>
+    const updatedMessages = messages?.map((msg: Message) =>
       msg.id === id ? { ...msg, content: newContent } : msg,
     );
-    setMessages(updatedMessages);
 
     // Update chat history
     const updatedChatHistory = chatHistory.map((chat) =>
@@ -100,11 +99,14 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       id: Date.now().toString(),
       content: text,
       role: "user",
+      createdAt: new Date(),
+      model: selectedModel,
+      parentId: null,
+      chatId: currentChatId || "",
     };
-    setMessages((prev) => [...prev, newMessage]);
   };
 
-  const input = messages[messages.length - 1]?.content || "";
+  const input = messages? messages[messages.length - 1]?.content : undefined;
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessages((prev) => [
       ...prev,
@@ -123,7 +125,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     setChatHistory,
     handleInputChange,
     handleSubmit,
-    setMessages,
     messages,
     selectedModel,
     setSelectedModel,
