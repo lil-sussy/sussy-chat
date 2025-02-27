@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
 import { Button, Drawer, List, Typography } from "antd";
-import { MenuOutlined, PlusOutlined, MessageOutlined, CloseOutlined } from "@ant-design/icons";
+import {
+  MenuOutlined,
+  PlusOutlined,
+  MessageOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
 import { cn } from "@/chat/lib/utils";
 import { useChat } from "@/chat/contexts/ChatContext";
 import SidebarContent from "./SidebarContent";
 
 export function ChatSidebar() {
-  const { chatHistory, handleSelectChat, handleNewChat, currentChatId } = useChat();
+  const { chatHistory, handleSelectChat, handleNewChat, currentChatId } =
+    useChat();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -15,13 +21,13 @@ export function ChatSidebar() {
     const checkIfMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     // Initial check
     checkIfMobile();
-    
+
     // Add event listener for window resize
     window.addEventListener("resize", checkIfMobile);
-    
+
     // Cleanup
     return () => window.removeEventListener("resize", checkIfMobile);
   }, []);
@@ -39,23 +45,19 @@ export function ChatSidebar() {
       type="text"
       icon={<MenuOutlined />}
       onClick={() => setDrawerVisible(true)}
-      className="top-4 left-4 z-10 bg-primary shadow-md rounded-md text-background hover:bg-primary/80"
+      className="left-4 top-4 z-10 rounded-md bg-primary text-background shadow-md hover:bg-primary/80"
       aria-label="Toggle sidebar"
     />
   );
 
   return (
     <div className="flex w-16 md:w-64">
-      {/* Mobile toggle button */}
-      {mobileToggle}
-      
-      {/* Desktop sidebar */}
-      {!isMobile && (
-        <div className="flex w-64 flex-col border-r border-gray-200 h-full">
-          <SidebarContent />
-        </div>
-      )}
-      
+      <div className="flex h-full w-64 flex-col border-r border-secondary">
+        {/* Mobile toggle button */}
+        {mobileToggle}
+        {/* Desktop sidebar */}
+        {!isMobile && <SidebarContent />}
+      </div>
       {/* Mobile drawer */}
       {isMobile && (
         <Drawer

@@ -9,7 +9,7 @@ const SidebarContent = () => {
 
   return (
     <>
-      <div className="border-b border-gray-200 p-4">
+      <div className="border-b border-secondary p-4">
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -24,14 +24,14 @@ const SidebarContent = () => {
         dataSource={chatHistory}
         renderItem={(chat) => (
           <List.Item
-            className="border-b border-gray-100 p-0"
+            className="border-b border-secondary p-0"
             onClick={() => handleSelectChat(chat.id)}
           >
             <Button
               type="text"
               icon={<MessageOutlined />}
               className={cn(
-                "w-full justify-start px-4 py-3 text-left bg-secondary hover:bg-secondary/80",
+                "w-full justify-start bg-secondary px-4 py-3 text-left hover:bg-secondary/80",
                 currentChatId === chat.id && "bg-accent/70 font-medium",
               )}
             >

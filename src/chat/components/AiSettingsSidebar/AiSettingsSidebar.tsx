@@ -13,7 +13,7 @@ export function AISettingsSidebar() {
   // For mobile: show a button that opens the drawer
   if (isMobile) {
     return (
-      <div className="flex w-16 lg:w-64">
+      <div className="flex w-16 lg:w-64 border-l border-secondary">
         <Button
           type="primary"
           shape="circle"
@@ -37,7 +37,7 @@ export function AISettingsSidebar() {
 
   // For desktop: show the sidebar
   return (
-    <div className="hidden lg:flex w-64 flex-col border-l border-gray-200 p-4">
+    <div className="hidden lg:flex w-64 flex-col border-l border-secondary p-4">
       <AiSettingsContent />
     </div>
   );

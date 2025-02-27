@@ -27,6 +27,25 @@ export default async function Home() {
             colorPrimaryBg: theme.colors.background,
             //@ts-expect-error theme is not typed
             colorPrimaryBgHover: theme.colors.layer1,
+            //@ts-expect-error theme is not typed
+            colorText: theme.colors.text,
+            //@ts-expect-error theme is not typed
+            colorBgBase: theme.colors.background,
+            //@ts-expect-error theme is not typed
+            colorBgElevated: theme.colors.layer1,
+            colorBgContainer: theme.colors.transparent,
+            //@ts-expect-error theme is not typed
+            colorBgContainerHover: theme.colors.transparent,
+            //@ts-expect-error theme is not typed
+            colorBgTextHover: theme.colors.primary,
+            //@ts-expect-error theme is not typed
+            colorBgText: theme.colors.text,
+            //@ts-expect-error theme is not typed
+            colorTextBase: theme.colors.text,
+            //@ts-expect-error theme is not typed
+            colorTextBaseHover: theme.colors.text,
+            //@ts-expect-error theme is not typed
+            colorTextBaseActive: theme.colors.text,
           },
           hashed: false,
         }}

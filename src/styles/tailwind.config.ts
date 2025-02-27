@@ -42,6 +42,7 @@ const config: Config = {
         },
         text: '#e6d6fe',
         background: '#05000c',
+        layer1: '#15162c',
         primary: '#ac77fc',
         secondary: '#be91fd',
         accent: '#f9246c',

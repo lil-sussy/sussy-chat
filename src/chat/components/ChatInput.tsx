@@ -75,15 +75,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="w-full">
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className="flex flex-row gap-2">
         <TextArea
           ref={inputRef}
           value={userPrompt}
           onChange={(e) => setUserPrompt(e.target.value)}
           placeholder={placeholder}
-          autoSize={{ minRows: isExpanded ? 3 : 1, maxRows: 6 }}
+          autoSize={{ minRows: isExpanded ? 3 : 1, maxRows: 20 }}
           onKeyDown={handleKeyDownInternal}
-          className="mb-2"
+          className="mb-2 bg-background/50 backdrop-blur-3xl hover:bg-background/70 active:bg-background/70 focus:bg-background/70"
         />
         <div className="flex justify-end">
           <Button

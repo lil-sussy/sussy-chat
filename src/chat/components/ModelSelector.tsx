@@ -54,7 +54,7 @@ export function ModelSelector() {
       {/* Model dropdown with search */}
       <Select
         mode="multiple"
-        className="min-w-full"
+        className="min-w-full bg-background/50 backdrop-blur-3xl"
         placeholder="Select models..."
         value={selectedModels}
         onChange={handleModelChange}
