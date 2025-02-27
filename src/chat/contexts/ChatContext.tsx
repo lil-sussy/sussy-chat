@@ -32,7 +32,7 @@ interface ChatContextType {
   setMaxTokens: React.Dispatch<React.SetStateAction<number>>;
   chatHistory: Chat[];
   handleSelectChat: (id: string) => void;
-  handleNewChat: () => void;
+  handleNewChat: () => Promise<void>;
   handleEditMessage: (id: string, newContent: string) => void;
   handleEditChatTitle: (newTitle: string) => Promise<void>;
   handleSubmit: (userPrompt: string) => Promise<void>;

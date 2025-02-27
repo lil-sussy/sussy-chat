@@ -2,6 +2,7 @@ import { Button, List, Typography } from "antd";
 import { PlusOutlined, MessageOutlined } from "@ant-design/icons";
 import { cn } from "@/chat/lib/utils";
 import { useChat } from "@/chat/contexts/ChatContext";
+import { AsyncButton } from "@/common/components/AsyncButton";
 
 const SidebarContent = () => {
   const { chatHistory, handleNewChat, selectedChat, handleSelectChat } =
@@ -10,14 +11,14 @@ const SidebarContent = () => {
   return (
     <>
       <div className="border-b border-secondary p-4 pt-0 pb-8">
-        <Button
+        <AsyncButton
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleNewChat}
           className="flex w-full items-center justify-center bg-primary text-background"
         >
           New Chat
-        </Button>
+        </AsyncButton>
       </div>
       <List
         className="flex-1 overflow-y-auto px-2"
