@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button, Drawer, List, Typography } from "antd";
-import { MenuOutlined, PlusOutlined, MessageOutlined } from "@ant-design/icons";
+import { MenuOutlined, PlusOutlined, MessageOutlined, CloseOutlined } from "@ant-design/icons";
 import { cn } from "@/chat/lib/utils";
 import { useChat } from "@/chat/contexts/ChatContext";
 import SidebarContent from "./SidebarContent";
@@ -39,7 +39,7 @@ export function ChatSidebar() {
       type="text"
       icon={<MenuOutlined />}
       onClick={() => setDrawerVisible(true)}
-      className="top-4 left-4 z-10 bg-white shadow-md rounded-md"
+      className="top-4 left-4 z-10 bg-primary shadow-md rounded-md text-background hover:bg-primary/80"
       aria-label="Toggle sidebar"
     />
   );
@@ -64,6 +64,8 @@ export function ChatSidebar() {
           onClose={() => setDrawerVisible(false)}
           open={drawerVisible}
           width={280}
+          closeIcon={<CloseOutlined className="text-text" />}
+          className="!bg-background/50 text-text backdrop-blur-3xl"
         >
           <SidebarContent />
         </Drawer>

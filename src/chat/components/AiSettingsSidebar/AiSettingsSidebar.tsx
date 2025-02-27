@@ -37,7 +37,7 @@ export function AISettingsSidebar() {
 
   // For desktop: show the sidebar
   return (
-    <div className="hidden lg:flex w-64 flex-col border-l border-gray-200 p-4 bg-white">
+    <div className="hidden lg:flex w-64 flex-col border-l border-gray-200 p-4">
       <AiSettingsContent />
     </div>
   );

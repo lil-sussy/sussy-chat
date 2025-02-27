@@ -14,13 +14,13 @@ const SidebarContent = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleNewChat}
-          className="flex w-full items-center justify-center"
+          className="flex w-full items-center justify-center bg-primary"
         >
           New Chat
         </Button>
       </div>
       <List
-        className="flex-1 overflow-y-auto"
+        className="flex-1 overflow-y-auto px-2"
         dataSource={chatHistory}
         renderItem={(chat) => (
           <List.Item
@@ -31,8 +31,8 @@ const SidebarContent = () => {
               type="text"
               icon={<MessageOutlined />}
               className={cn(
-                "w-full justify-start px-4 py-3 text-left hover:bg-gray-100",
-                currentChatId === chat.id && "bg-gray-100 font-medium",
+                "w-full justify-start px-4 py-3 text-left bg-secondary hover:bg-secondary/80",
+                currentChatId === chat.id && "bg-accent/70 font-medium",
               )}
             >
               <Typography.Text ellipsis className="ml-2">
