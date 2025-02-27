@@ -4,7 +4,7 @@ import { cn } from "@/chat/lib/utils";
 import { useChat } from "@/chat/contexts/ChatContext";
 
 const SidebarContent = () => {
-  const { chatHistory, handleNewChat, currentChatId, handleSelectChat } =
+  const { chatHistory, handleNewChat, selectedChat, handleSelectChat } =
     useChat();
 
   return (
@@ -32,7 +32,7 @@ const SidebarContent = () => {
               icon={<MessageOutlined />}
               className={cn(
                 "w-full justify-start bg-secondary px-4 py-3 text-left text-background hover:bg-secondary/80",
-                currentChatId === chat.id && "bg-accent/70 font-medium",
+                selectedChat?.id === chat.id && "bg-accent/70 font-medium",
               )}
             >
               <Typography.Text ellipsis className="ml-2 text-background hover:text-text/80">

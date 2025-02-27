@@ -31,7 +31,6 @@ interface ChatContextType {
   maxTokens: number;
   setMaxTokens: React.Dispatch<React.SetStateAction<number>>;
   chatHistory: Chat[];
-  currentChatId: string | null;
   handleSelectChat: (id: string) => void;
   handleNewChat: () => void;
   handleEditMessage: (id: string, newContent: string) => void;
@@ -63,16 +62,15 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
 }) => {
   const { data: chats } = api.chat.getAll.useQuery();
   const [chatHistory, setChatHistory] = useState<Chat[]>([]);
-  const lastChat = chats? chats[chats.length - 1] : null;
   const [selectedModels, setSelectedModels] = useState<string[]>([initialChatBody.model]);
   const { data: allModelsData } = api.chat.getAllModels.useQuery();
   const allModels = allModelsData as OpenRouterModel[]|undefined;
-  const [selectedChat, setSelectedChat] = useState<Chat | null>(lastChat as unknown as Chat || null);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const messages = selectedChat?.messages;
+
   const [systemPrompt, setSystemPrompt] = useState<string>(initialChatBody.systemPrompt);
   const [temperature, setTemperature] = useState<number>(initialChatBody.temperature);
   const [maxTokens, setMaxTokens] = useState<number>(initialChatBody.maxTokens);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(lastChat?.id || null);
   
   const newChatMutation = api.chat.create.useMutation();
   const sendMessageMutation = api.chat.generateWithModel.useMutation();
@@ -84,6 +82,9 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   React.useEffect(() => {
     if (chats) {
       setChatHistory(chats as unknown as Chat[]);
+      if (!selectedChat && chats.length > 0) {
+        setSelectedChat(chats[chats.length - 1] as unknown as Chat);
+      }
     }
   }, [chats]);
 
@@ -96,11 +97,11 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       ...chatHistory,
       newChat as unknown as Chat
     ]);
-    setCurrentChatId(newChat.id);
+    setSelectedChat(newChat as unknown as Chat);
   };
 
   const handleSelectChat = (id: string) => {
-    setCurrentChatId(id);
+    setSelectedChat(chatHistory.find(chat => chat.id === id) as unknown as Chat);
   };
 
   const handleEditMessage = (id: string, newContent: string) => {
@@ -110,7 +111,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
 
     // Update chat history
     const updatedChatHistory = chatHistory.map((chat) =>
-      chat.id === currentChatId ? { ...chat, messages: updatedMessages } : chat,
+      chat.id === selectedChat?.id ? { ...chat, messages: updatedMessages } : chat,
     );
     setChatHistory(updatedChatHistory);
   };
@@ -119,7 +120,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     await sendMessageMutation.mutateAsync({
       modelIds: selectedModels,
       prompt: userPrompt,
-      chatId: currentChatId || "",
+      chatId: selectedChat?.id || "",
       parentMessageId: messages? messages[messages.length - 1]?.id : undefined,
       systemPrompt: systemPrompt,
       temperature: temperature,
@@ -143,7 +144,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     maxTokens,
     setMaxTokens,
     chatHistory,
-    currentChatId,
     handleSelectChat,
     handleNewChat,
     handleEditMessage,

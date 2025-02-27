@@ -15,11 +15,11 @@ import { ChatSidebar } from "@/chat/components/ChatSidebar/ChatSidebar";
 import { ModelSelector } from "@/chat/components/ModelSelector";
 import { ChatMessageContainer } from "@/chat/components/ChatMessage/ChatMessageContainer";
 import { AISettingsSidebar } from "@/chat/components/AiSettingsSidebar/AiSettingsSidebar";
-import { ChatProvider } from "../contexts/ChatContext";
+import { ChatProvider, useChat } from "../contexts/ChatContext";
 import ChatContainer from "./ChatContainer";
 import { useSession } from "next-auth/react";
 import { api } from "@/trpc/react";
-import { Spin } from "antd";
+import { Spin, Typography } from "antd";
 
 export default function ChatInterface() {
   const { data: session } = useSession();
@@ -27,6 +27,8 @@ export default function ChatInterface() {
   if (!session) {
     return <Spin />;
   }
+
+  const { selectedChat } = useChat();
   
 
   return (
@@ -34,7 +36,7 @@ export default function ChatInterface() {
       <div className="flex h-full">
         <ChatSidebar />
         <div className="flex flex-1 flex-col">
-
+          <Typography.Title level={3} className="p-4 pb-2">{selectedChat?.title}</Typography.Title>
           <div className="flex items-center justify-between border-secondary p-4 pb-2">
             {/* <CardTitle>Chat Interface</CardTitle> */}
             <ModelSelector />
