@@ -30,6 +30,13 @@ export default async function Home() {
             colorBgTextHover: theme.colors.primary,
             colorTextBase: theme.colors.text,
           },
+          components: {
+            Button: {
+              colorTextBase: theme.colors.background,
+              colorBgBase: theme.colors.primary,
+              colorBgTextHover: theme.colors.text,
+            },
+          },
           hashed: false,
         }}
       >

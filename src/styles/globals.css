@@ -76,6 +76,10 @@ h3.ant-typography {
   color: #fff;
 }
 
+.ant-btn-variant-solid:not(:disabled):not(.ant-btn-disabled):hover {
+  color: unset;
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -11,8 +11,7 @@ import { useChat } from "@/chat/contexts/ChatContext";
 import SidebarContent from "./SidebarContent";
 
 export function ChatSidebar() {
-  const { chatHistory, handleSelectChat, handleNewChat, currentChatId } =
-    useChat();
+  const { chatHistory, handleSelectChat, handleNewChat } = useChat();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 

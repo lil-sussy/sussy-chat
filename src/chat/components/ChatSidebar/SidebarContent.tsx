@@ -10,12 +10,12 @@ const SidebarContent = () => {
 
   return (
     <>
-      <div className="border-b border-secondary p-4 pt-0 pb-8">
+      <div className="border-b border-secondary p-4 pb-8 pt-0">
         <AsyncButton
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleNewChat}
-          className="flex w-full items-center justify-center bg-primary text-background"
+          className="flex w-full items-center justify-center text-background hover:text-background"
         >
           New Chat
         </AsyncButton>
@@ -32,11 +32,20 @@ const SidebarContent = () => {
               type="text"
               icon={<MessageOutlined />}
               className={cn(
-                "w-full justify-start bg-secondary px-4 py-3 text-left text-background hover:bg-secondary/80",
-                selectedChat?.id === chat.id && "bg-accent/70 font-medium",
+                "group w-full justify-start px-4 py-3 text-left",
+                selectedChat?.id !== chat.id &&
+                  "bg-secondary text-background hover:bg-secondary/80",
+                selectedChat?.id === chat.id &&
+                  "bg-secondary/20 font-medium text-text",
               )}
             >
-              <Typography.Text ellipsis className="ml-2 text-background hover:text-text/80">
+              <Typography.Text
+                ellipsis
+                className={cn(
+                  "ml-2 text-background group-hover:text-text/80",
+                  selectedChat?.id === chat.id && "text-text",
+                )}
+              >
                 {chat.title}
               </Typography.Text>
             </Button>
