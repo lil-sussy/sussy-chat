@@ -5,37 +5,29 @@ import { useChat } from "../contexts/ChatContext";
 import { Select, Tag, Space } from "antd";
 import { CloseOutlined, SearchOutlined } from "@ant-design/icons";
 
-const models = [
-  { value: "gpt-4-turbo", label: "GPT-4 Turbo" },
-  { value: "gpt-3.5-turbo", label: "GPT-3.5 Turbo" },
-  { value: "claude-2", label: "Claude 2" },
-  { value: "palm-2", label: "PaLM 2" },
-];
-
 export function ModelSelector() {
   // Get the setSelectedModel from context but support multiple models
-  const { setSelectedModel } = useChat();
-  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const { selectedModels, setSelectedModels, allModels } = useChat();
 
   // Update selected models and notify context
   const handleModelChange = (values: string[]) => {
     setSelectedModels(values);
     // If supporting multiple models in the future, pass the array
     // For now, use the first selected model or empty string
-    setSelectedModel(values.length > 0 ? values[0]?? "" : "");
+    setSelectedModels(values.length > 0 ? values : []);
   };
 
   // Handle removing a tag
   const handleRemoveModel = (modelValue: string) => {
     const newSelectedModels = selectedModels.filter(value => value !== modelValue);
     setSelectedModels(newSelectedModels);
-    setSelectedModel(newSelectedModels.length > 0 ? newSelectedModels[0]?? "" : "");
+    setSelectedModels(newSelectedModels.length > 0 ? newSelectedModels : []);
   };
 
   // Custom render for the tags
   const tagRender = (props: any) => {
     const { value, closable, onClose } = props;
-    const model = models.find(m => m.value === value);
+    const model = allModels?.find((m) => m.id === value);
     
     return (
       <Tag
@@ -44,7 +36,7 @@ export function ModelSelector() {
         onClose={onClose}
         style={{ marginRight: 3, display: 'flex', alignItems: 'center' }}
       >
-        {model?.label || value}
+        {model?.name || value}
       </Tag>
     );
   };
@@ -62,7 +54,10 @@ export function ModelSelector() {
         filterOption={(input, option) => 
           (option?.label?.toString().toLowerCase() || '').includes(input.toLowerCase())
         }
-        options={models}
+        options={allModels?.map((model) => ({
+          value: model.id,
+          label: model.name,
+        }))}
         maxTagCount={3}
         tagRender={tagRender}
         suffixIcon={<SearchOutlined />}
