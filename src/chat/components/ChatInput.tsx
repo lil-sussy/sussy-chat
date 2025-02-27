@@ -1,28 +1,37 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input, Button } from "antd";
 import { SendOutlined } from "@ant-design/icons";
+import { useChat } from "../contexts/ChatContext";
 
 const { TextArea } = Input;
 
 interface ChatInputProps {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
   keyFocus?: boolean;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   placeholder?: string;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
-  value,
-  onChange,
-  onSubmit,
   keyFocus = false,
-  onKeyDown,
   placeholder = "Type your message... (Shift+Enter for new line)",
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const isExpanded = value.length > 50 || value.includes("\n");
+  const [userPrompt, setUserPrompt] = useState<string>("");
+  const { handleSubmit } = useChat();
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (keyFocus) {
+      inputRef.current?.focus();
+    }
+  }, [keyFocus]);
+
+  useEffect(() => {
+    if (userPrompt.length > 50 || userPrompt.includes("\n")) {
+      setIsExpanded(true);
+    } else {
+      setIsExpanded(false);
+    }
+  }, [userPrompt]);
 
   // Focus input on any key press if keyFocus is true
   useEffect(() => {
@@ -49,17 +58,19 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [keyFocus]);
 
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmit(userPrompt);
+  };
+
   // Handle Shift+Enter for new line
   const handleKeyDownInternal = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (value.trim()) {
+      if (userPrompt.trim()) {
         onSubmit(e as unknown as React.FormEvent);
       }
     }
-    
-    // Pass to external handler if provided
-    onKeyDown?.(e);
   };
 
   return (
@@ -67,19 +78,19 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       <form onSubmit={onSubmit}>
         <TextArea
           ref={inputRef}
-          value={value}
-          onChange={onChange}
+          value={userPrompt}
+          onChange={(e) => setUserPrompt(e.target.value)}
           placeholder={placeholder}
           autoSize={{ minRows: isExpanded ? 3 : 1, maxRows: 6 }}
           onKeyDown={handleKeyDownInternal}
           className="mb-2"
         />
         <div className="flex justify-end">
-          <Button 
-            type="primary" 
-            htmlType="submit" 
+          <Button
+            type="primary"
+            htmlType="submit"
             icon={<SendOutlined />}
-            disabled={!value.trim()}
+            disabled={!userPrompt.trim()}
           >
             Send
           </Button>

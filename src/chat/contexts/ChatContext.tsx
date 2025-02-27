@@ -26,9 +26,7 @@ interface ChatContextType {
   handleNewChat: () => void;
   handleEditMessage: (id: string, newContent: string) => void;
   sendMessage: (text: string) => void;
-  input: string | undefined;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: () => void;
+  handleSubmit: (userPrompt: string) => Promise<void>;
 }
 
 interface ChatProviderProps {
@@ -62,6 +60,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   const [maxTokens, setMaxTokens] = useState<number>(initialChatBody.maxTokens);
   const [currentChatId, setCurrentChatId] = useState<string | null>(lastChat?.id || null);
   const newChatMutation = api.chat.create.useMutation();
+  const sendMessageMutation = api.chat.generateWithModel.useMutation();
   const { data: messages } = api.chat.getAllMessages.useQuery({
     chatId: currentChatId || "",
   });
@@ -106,24 +105,20 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     };
   };
 
-  const input = messages? messages[messages.length - 1]?.content : undefined;
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), content: e.target.value, role: "user" },
-    ]);
-  };
-  const handleSubmit = () => {
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), content: input, role: "user" },
-    ]);
+  const handleSubmit = async (userPrompt: string) => {
+    await sendMessageMutation.mutateAsync({
+      modelId: selectedModel,
+      prompt: userPrompt,
+      chatId: currentChatId || "",
+      parentMessageId: messages? messages[messages.length - 1]?.id : undefined,
+      systemPrompt: systemPrompt,
+      temperature: temperature,
+      maxTokens: maxTokens,
+    });
   };
 
   const value = {
-    input,
     setChatHistory,
-    handleInputChange,
     handleSubmit,
     messages,
     selectedModel,

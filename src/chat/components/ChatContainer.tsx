@@ -8,17 +8,10 @@ import { Message } from "prisma/prisma-client";
 export default function ChatContainer() {
   const {
     messages,
-    input,
-    handleInputChange,
     handleSubmit,
     handleEditMessage,
   } = useChat();
 
-  // Create a wrapper function to handle the type mismatch
-  const handleTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    // The actual value we care about is the same in both event types
-    handleInputChange(e as unknown as ChangeEvent<HTMLInputElement>);
-  };
 
   return (
     <Card 
@@ -38,9 +31,6 @@ export default function ChatContainer() {
       
       <div className="mt-auto">
         <ChatInput
-          value={input || ""}
-          onChange={handleTextAreaChange}
-          onSubmit={handleSubmit}
           keyFocus={true}
         />
       </div>
