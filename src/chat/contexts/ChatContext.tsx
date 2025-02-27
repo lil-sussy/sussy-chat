@@ -34,6 +34,7 @@ interface ChatContextType {
   handleSelectChat: (id: string) => void;
   handleNewChat: () => void;
   handleEditMessage: (id: string, newContent: string) => void;
+  handleEditChatTitle: (newTitle: string) => Promise<void>;
   handleSubmit: (userPrompt: string) => Promise<void>;
   allModels: OpenRouterModel[]|undefined;
 }
@@ -74,6 +75,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
   
   const newChatMutation = api.chat.create.useMutation();
   const sendMessageMutation = api.chat.generateWithModel.useMutation();
+  const updateChatTitleMutation = api.chat.updateTitle.useMutation();
   // const { data: messages } = api.chat.getAllMessages.useQuery({
   //   chatId: currentChatId || "",
   // });
@@ -98,6 +100,17 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
       newChat as unknown as Chat
     ]);
     setSelectedChat(newChat as unknown as Chat);
+  };
+
+  const handleEditChatTitle = async (newTitle: string) => {
+    await updateChatTitleMutation.mutateAsync({
+      chatId: selectedChat?.id || "",
+      title: newTitle,
+    });
+    const updatedChatHistory = chatHistory.map((chat) =>
+      chat.id === selectedChat?.id ? { ...chat, title: newTitle } : chat,
+    );
+    setChatHistory(updatedChatHistory);
   };
 
   const handleSelectChat = (id: string) => {
@@ -147,6 +160,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({
     handleSelectChat,
     handleNewChat,
     handleEditMessage,
+    handleEditChatTitle,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

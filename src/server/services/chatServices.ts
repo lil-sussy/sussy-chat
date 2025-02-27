@@ -174,8 +174,14 @@ export class ChatService {
       createdAt: new Date(message.createdAt)
     };
   }
-}
 
+  async updateChatTitle(chatId: string, title: string) {
+    return this.prisma.chat.update({
+      where: { id: chatId },
+      data: { title },
+    });
+  }
+}
 // Factory function to create a chat service with the provided Prisma instance
 export function createChatService(prisma: PrismaClient) {
   return new ChatService(prisma);

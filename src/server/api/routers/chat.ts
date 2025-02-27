@@ -60,6 +60,13 @@ export const chatRouter = createTRPCRouter({
       return chatService.getAllMessagesFromChat(input.chatId);
     }),
 
+  updateTitle: protectedProcedure
+    .input(z.object({ chatId: z.string(), title: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const chatService = createChatService(ctx.db);
+      return chatService.updateChatTitle(input.chatId, input.title);
+    }),
+
   // Generate message with a specific model
   generateWithModel: protectedProcedure
     .input(modelRequestSchema)
