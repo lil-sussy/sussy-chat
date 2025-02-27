@@ -2,10 +2,21 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { createChatService } from "@/server/services/chatServices";
 import openRouterService, { type ChatMessage } from "@/server/services/openRouterServices";
+import axios from "axios";
+
+export interface OpenRouterModel {
+  id: string;
+  name: string;
+  description: string;
+  pricing: {
+    prompt: number;
+    completion: number;
+  };
+}
 
 // Zod schema for model request
 const modelRequestSchema = z.object({
-  modelId: z.string(),
+  modelIds: z.array(z.string()),
   prompt: z.string(),
   chatId: z.string(),
   parentMessageId: z.string().optional(),
@@ -24,9 +35,14 @@ export const chatRouter = createTRPCRouter({
     }),
 
   // Get all chats for the current user
-  getAll: protectedProcedure.query(({ ctx }) => {
+  getAll: protectedProcedure.query(async ({ ctx }) => {
     const chatService = createChatService(ctx.db);
-    return chatService.getAllChats(ctx.session.user.id);
+    return await chatService.getAllChats(ctx.session.user.id);
+  }),
+
+  getAllModels: protectedProcedure.query(async ({ ctx }) => {
+    const models = await axios.get("https://openrouter.ai/api/v1/models");
+    return models.data.data as OpenRouterModel[];
   }),
 
   // Get a single chat by ID
@@ -48,7 +64,7 @@ export const chatRouter = createTRPCRouter({
   generateWithModel: protectedProcedure
     .input(modelRequestSchema)
     .mutation(async ({ ctx, input }) => {
-      const { modelId, prompt, chatId, parentMessageId, systemPrompt, temperature, maxTokens } = input;
+      const { modelIds, prompt, chatId, parentMessageId, systemPrompt, temperature, maxTokens } = input;
       const chatService = createChatService(ctx.db);
       
       // Get the chat to verify ownership
@@ -70,28 +86,32 @@ export const chatRouter = createTRPCRouter({
       
       try {
         // Call OpenRouter API
-        const result = await openRouterService.getModelResponse(
-          modelId, 
-          messages, 
-          temperature, 
-          maxTokens
+        const results = await Promise.allSettled(
+          modelIds.map(async (modelId) => {
+            return openRouterService.getModelResponse(modelId, messages, temperature, maxTokens);
+          })
         );
-        
         // Create assistant message in the database
-        const assistantMessage = await chatService.createAssistantMessage({
-          content: result.content || "",
-          chatId,
-          parentId: userMessage.id,
-          model: result.model,
-        });
+        const assistantMessages = [];
+        for (const result of results) {
+          if (result.status === "fulfilled") {
+            const assistantMessage = await chatService.createAssistantMessage({
+              content: result.value.content || "",
+              chatId,
+              parentId: userMessage.id,
+              model: result.value.model,
+            });
+            assistantMessages.push(assistantMessage);
+          }
+        }
         
         // Update the user message's children
-        await chatService.updateMessageChildren(userMessage.id, assistantMessage.id);
+        await chatService.updateMessageChildren(userMessage.id, assistantMessages[0]?.id || "");
         
         // Update chat's activeMessageId to this new message path
-        await chatService.updateChatActiveMessage(chatId, assistantMessage.id);
+        await chatService.updateChatActiveMessage(chatId, assistantMessages[0]?.id || "");
         
-        return assistantMessage;
+        return assistantMessages;
       } catch (error) {
         console.error("Error calling OpenRouter API:", error);
         throw new Error("Failed to generate response from model");

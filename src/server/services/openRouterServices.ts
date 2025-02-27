@@ -6,7 +6,7 @@ const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const OPENROUTER_REFERER = "https://sussy-chat.example.com";
 
 // Type for OpenRouter API response
-interface OpenRouterResponse {
+export interface OpenRouterResponse {
   id: string;
   choices: {
     message: {

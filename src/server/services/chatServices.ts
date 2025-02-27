@@ -5,10 +5,18 @@ export class ChatService {
 
   // Chat CRUD operations
   async createChat(userId: string, title: string) {
-    return this.prisma.chat.create({
+    const chat = await this.prisma.chat.create({
       data: {
         title,
         userId,
+      },
+    });
+    return await this.prisma.chat.findUnique({
+      where: {
+        id: chat.id,
+      },
+      include: {
+        messages: true,
       },
     });
   }
@@ -32,7 +40,7 @@ export class ChatService {
   }
 
   async getChatById(chatId: string, userId: string) {
-    return this.prisma.chat.findFirst({
+    const chat = await this.prisma.chat.findFirst({
       where: {
         id: chatId,
         userId,
@@ -45,14 +53,31 @@ export class ChatService {
         },
       },
     });
+    
+    if (!chat) return null;
+    
+    return {
+      ...chat,
+      createdAt: new Date(chat.createdAt),
+      updatedAt: new Date(chat.updatedAt),
+      messages: chat.messages.map(message => ({
+        ...message,
+        createdAt: new Date(message.createdAt)
+      }))
+    };
   }
 
   async getAllMessagesFromChat(chatId: string) {
-    return this.prisma.message.findMany({
+    const messages = await this.prisma.message.findMany({
       where: {
         chatId,
       },
     });
+    
+    return messages.map(message => ({
+      ...message,
+      createdAt: new Date(message.createdAt)
+    }));
   }
   
   async updateChatActiveMessage(chatId: string, messageId: string) {
@@ -76,7 +101,7 @@ export class ChatService {
     chatId: string;
     parentId: string | null;
   }) {
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content,
         role: "user" as Role,
@@ -85,6 +110,11 @@ export class ChatService {
         parentId: parentId || null,
       },
     });
+    
+    return {
+      ...message,
+      createdAt: new Date(message.createdAt)
+    };
   }
 
   async createAssistantMessage({
@@ -98,7 +128,7 @@ export class ChatService {
     parentId: string;
     model: string;
   }) {
-    return this.prisma.message.create({
+    const message = await this.prisma.message.create({
       data: {
         content,
         role: "assistant" as Role,
@@ -107,6 +137,11 @@ export class ChatService {
         parentId,
       },
     });
+    
+    return {
+      ...message,
+      createdAt: new Date(message.createdAt)
+    };
   }
 
   async updateMessageChildren(messageId: string, childId: string) {
@@ -125,12 +160,19 @@ export class ChatService {
   }
 
   async getMessageById(messageId: string, chatId: string) {
-    return this.prisma.message.findFirst({
+    const message = await this.prisma.message.findFirst({
       where: {
         id: messageId,
         chatId,
       },
     });
+    
+    if (!message) return null;
+    
+    return {
+      ...message,
+      createdAt: new Date(message.createdAt)
+    };
   }
 }
 
