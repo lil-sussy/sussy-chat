@@ -9,12 +9,12 @@ const SidebarContent = () => {
 
   return (
     <>
-      <div className="border-b border-secondary p-4">
+      <div className="border-b border-secondary p-4 pt-0 pb-8">
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={handleNewChat}
-          className="flex w-full items-center justify-center bg-primary"
+          className="flex w-full items-center justify-center bg-primary text-background"
         >
           New Chat
         </Button>
@@ -31,11 +31,11 @@ const SidebarContent = () => {
               type="text"
               icon={<MessageOutlined />}
               className={cn(
-                "w-full justify-start bg-secondary px-4 py-3 text-left hover:bg-secondary/80",
+                "w-full justify-start bg-secondary px-4 py-3 text-left text-background hover:bg-secondary/80",
                 currentChatId === chat.id && "bg-accent/70 font-medium",
               )}
             >
-              <Typography.Text ellipsis className="ml-2">
+              <Typography.Text ellipsis className="ml-2 text-background hover:text-text/80">
                 {chat.title}
               </Typography.Text>
             </Button>
