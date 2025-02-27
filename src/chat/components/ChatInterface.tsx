@@ -30,20 +30,20 @@ export default function ChatInterface() {
   
 
   return (
-    <ChatProvider>
+    
       <div className="flex h-full">
         <ChatSidebar />
         <div className="flex flex-1 flex-col">
-          <div className="flex items-center justify-between border-b border-secondary p-4">
+
+          <div className="flex items-center justify-between border-secondary p-4 pb-2">
             {/* <CardTitle>Chat Interface</CardTitle> */}
             <ModelSelector />
           </div>
-          <div className="flex-1 overflow-auto p-4">
+          <div className="flex-1 overflow-auto p-4 pt-2">
             <ChatContainer />
           </div>
         </div>
         <AISettingsSidebar/>
       </div>
-    </ChatProvider>
   );
 }
