@@ -1,106 +1,76 @@
-import axios from "axios";
-import { env } from "@/env";
+import { type Message } from '@prisma/client';
+import { prisma } from '../db';
+import { getMessageHistory } from './chatServices';
 
-// OpenRouter API constants
-const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_REFERER = "https://sussy-chat.example.com";
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_BASE_URL = process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api/v1';
 
-// Type for OpenRouter API response
-interface OpenRouterResponse {
-  id: string;
-  choices: {
-    message: {
-      role: string;
-      content: string;
-    };
-    index: number;
-  }[];
-  model: string;
-  // ... other fields from OpenRouter response
+interface OpenRouterRequest {
+    messages: Array<{
+        role: 'user' | 'assistant' | 'system';
+        content: string;
+    }>;
+    model: string;
+    temperature?: number;
 }
 
-// Type for message format
-export interface ChatMessage {
-  role: string;
-  content: string;
-}
+export const generateResponses = async (
+    userMessage: Message,
+    models: string[],
+    temperature: number = 0.7
+): Promise<Message[]> => {
+    // Use service to get message history
+    const messageHistory = await getMessageHistory(
+        userMessage.chatId,
+        userMessage.parentId
+    );
 
-export class OpenRouterService {
-  /**
-   * Get a response from a specific model via OpenRouter API
-   */
-  async getModelResponse(
-    modelId: string, 
-    messages: ChatMessage[], 
-    temperature: number = 0.7, 
-    maxTokens: number = 1000
-  ) {
-    try {
-      const response = await axios.post<OpenRouterResponse>(
-        OPENROUTER_API_URL,
-        {
-          model: modelId,
-          messages,
-          temperature,
-          max_tokens: maxTokens,
-        },
-        {
-          headers: {
-            "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
-            "HTTP-Referer": OPENROUTER_REFERER,
-            "Content-Type": "application/json",
-          },
+    // Format messages for OpenRouter API
+    const messages = messageHistory.map(msg => ({
+        role: msg.role,
+        content: msg.content
+    }));
+
+    // Create parallel requests for all requested models
+    const requests = models.map(async model => {
+        try {
+            const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': 'https://your-domain.com',
+                    'X-Title': 'Sussy Chat'
+                },
+                body: JSON.stringify({
+                    messages,
+                    model,
+                    temperature,
+                    stream: false
+                })
+            });
+
+            if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
+
+            const data = await response.json();
+            const content = data.choices[0].message.content;
+
+            // Create and return the new message
+            return prisma.message.create({
+                data: {
+                    content,
+                    role: 'assistant',
+                    model,
+                    chatId: userMessage.chatId,
+                    parentId: userMessage.id // Link to user message as parent
+                }
+            });
+        } catch (error) {
+            console.error(`Error generating response for model ${model}:`, error);
+            return null;
         }
-      );
-
-      return {
-        modelId,
-        content: response.data.choices[0]?.message.content,
-        model: response.data.model,
-      };
-    } catch (error) {
-      console.error(`Error with model ${modelId}:`, error);
-      throw new Error(`Failed to get response from ${modelId}`);
-    }
-  }
-
-  /**
-   * Format messages for OpenRouter API
-   */
-  formatMessages(userPrompt: string, systemPrompt?: string): ChatMessage[] {
-    const messages: ChatMessage[] = [];
-    
-    if (systemPrompt) {
-      messages.push({
-        role: "system",
-        content: systemPrompt,
-      });
-    }
-    
-    messages.push({
-      role: "user",
-      content: userPrompt,
     });
-    
-    return messages;
-  }
-}
 
-// Singleton instance for convenience
-const openRouterService = new OpenRouterService();
-
-/**
- * Get a response from OpenRouter API
- * @deprecated Use the OpenRouterService class instead
- */
-export async function getOpenRouterResponse(
-  modelId: string, 
-  messages: ChatMessage[], 
-  temperature: number = 0.7, 
-  maxTokens: number = 1000
-) {
-  return openRouterService.getModelResponse(modelId, messages, temperature, maxTokens);
-}
-
-// Export singleton instance
-export default openRouterService;
+    const results = await Promise.all(requests);
+    return results.filter(Boolean) as Message[];
+};

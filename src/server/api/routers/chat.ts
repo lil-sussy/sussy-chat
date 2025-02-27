@@ -1,186 +1,55 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { createChatService } from "@/server/services/chatServices";
-import openRouterService, { type ChatMessage } from "@/server/services/openRouterServices";
-
-// Zod schema for model request
-const modelRequestSchema = z.object({
-  modelId: z.string(),
-  prompt: z.string(),
-  chatId: z.string(),
-  parentMessageId: z.string().optional(),
-  systemPrompt: z.string().optional(),
-  temperature: z.number().optional().default(0.7),
-  maxTokens: z.number().optional().default(1000),
-});
+import { prisma } from '@/server/db';
+import { generateResponses } from '@/server/services/openRouterServices';
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
+import {
+  createUserMessage,
+  createAiMessage,
+  updateChatActiveMessage,
+  getMessageHistory
+} from '@/server/services/chatServices';
 
 export const chatRouter = createTRPCRouter({
-  // Create a new chat
-  create: protectedProcedure
-    .input(z.object({ title: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const chatService = createChatService(ctx.db);
-      return chatService.createChat(ctx.session.user.id, input.title);
-    }),
-
-  // Get all chats for the current user
-  getAll: protectedProcedure.query(({ ctx }) => {
-    const chatService = createChatService(ctx.db);
-    return chatService.getAllChats(ctx.session.user.id);
-  }),
-
-  // Get a single chat by ID
-  getById: protectedProcedure
-    .input(z.object({ chatId: z.string() }))
-    .query(({ ctx, input }) => {
-      const chatService = createChatService(ctx.db);
-      return chatService.getChatById(input.chatId, ctx.session.user.id);
-    }),
-
-  // Generate message with a specific model
-  generateWithModel: protectedProcedure
-    .input(modelRequestSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { modelId, prompt, chatId, parentMessageId, systemPrompt, temperature, maxTokens } = input;
-      const chatService = createChatService(ctx.db);
-      
-      // Get the chat to verify ownership
-      const chat = await chatService.getChatById(chatId, ctx.session.user.id);
-      
-      if (!chat) {
-        throw new Error("Chat not found or you don't have access");
-      }
-
-      // Create user message
-      const userMessage = await chatService.createUserMessage({
-        content: prompt,
-        chatId,
-        parentId: parentMessageId || null,
-      });
-
-      // Format messages for OpenRouter API
-      const messages = openRouterService.formatMessages(prompt, systemPrompt);
-      
-      try {
-        // Call OpenRouter API
-        const result = await openRouterService.getModelResponse(
-          modelId, 
-          messages, 
-          temperature, 
-          maxTokens
-        );
-        
-        // Create assistant message in the database
-        const assistantMessage = await chatService.createAssistantMessage({
-          content: result.content || "",
-          chatId,
-          parentId: userMessage.id,
-          model: result.model,
-        });
-        
-        // Update the user message's children
-        await chatService.updateMessageChildren(userMessage.id, assistantMessage.id);
-        
-        // Update chat's activeMessageId to this new message path
-        await chatService.updateChatActiveMessage(chatId, assistantMessage.id);
-        
-        return assistantMessage;
-      } catch (error) {
-        console.error("Error calling OpenRouter API:", error);
-        throw new Error("Failed to generate response from model");
-      }
-    }),
-
-  // Generate alternative responses using multiple models
-  generateAlternatives: protectedProcedure
+  createMessage: protectedProcedure
     .input(z.object({
       chatId: z.string(),
-      parentMessageId: z.string(),
-      prompt: z.string(),
-      modelIds: z.array(z.string()),
-      systemPrompt: z.string().optional(),
-      temperature: z.number().optional().default(0.7),
-      maxTokens: z.number().optional().default(1000),
+      content: z.string(),
+      models: z.array(z.string()),
+      temperature: z.number().optional()
     }))
-    .mutation(async ({ ctx, input }) => {
-      const { modelIds, prompt, chatId, parentMessageId, systemPrompt, temperature, maxTokens } = input;
-      const chatService = createChatService(ctx.db);
-      
-      // Verify chat ownership 
-      const chat = await chatService.getChatById(chatId, ctx.session.user.id);
-      
-      if (!chat) {
-        throw new Error("Chat not found or you don't have access");
-      }
-      
-      // Create a single user message
-      const userMessage = await chatService.createUserMessage({
-        content: prompt,
-        chatId,
-        parentId: parentMessageId || null,
-      });
-      
-      // Format messages for OpenRouter API
-      const messages = openRouterService.formatMessages(prompt, systemPrompt);
-      
-      // Generate responses from all requested models
-      const results = await Promise.allSettled(
-        modelIds.map(async (modelId) => {
-          return openRouterService.getModelResponse(modelId, messages, temperature, maxTokens);
-        })
+    .mutation(async ({ input, ctx }) => {
+      // Create user message using service
+      const userMessage = await createUserMessage(
+        input.chatId,
+        ctx.user.id,
+        input.content
       );
-      
-      // Create assistant messages for each successful response
-      const assistantMessages = [];
-      
-      for (const result of results) {
-        if (result.status === "fulfilled") {
-          const assistantMessage = await chatService.createAssistantMessage({
-            content: result.value.content || "",
-            chatId,
-            parentId: userMessage.id,
-            model: result.value.model,
-          });
-          
-          assistantMessages.push(assistantMessage);
-        }
-      }
-      
-      // Set the first successful response as active if any
-      if (assistantMessages.length > 0) {
-        await chatService.updateChatActiveMessage(chatId, assistantMessages[0]?.id || "");
-      }
-      
+
+      // Generate AI responses in parallel
+      const aiMessages = await generateResponses(
+        userMessage,
+        input.models,
+        input.temperature
+      );
+
+      // Update chat using service
+      await updateChatActiveMessage(input.chatId, userMessage.id);
+
       return {
         userMessage,
-        assistantMessages,
+        aiMessages
       };
     }),
+  chat: createTRPCRouter({
+    create: protectedProcedure.input(z.object({
+      chat: z.string(), // this should be the prisma type of chat
+      models: z.array(z.string()),
+    })).mutation(async ({ ctx, input }) => {
 
-  // Update the active message branch
-  setActiveMessage: protectedProcedure
-    .input(z.object({
-      chatId: z.string(),
-      messageId: z.string(),
-    }))
-    .mutation(async ({ ctx, input }) => {
-      const chatService = createChatService(ctx.db);
-      
-      // Verify chat ownership
-      const chat = await chatService.getChatById(input.chatId, ctx.session.user.id);
-      
-      if (!chat) {
-        throw new Error("Chat not found or you don't have access");
-      }
-      
-      // Verify message exists in this chat
-      const message = await chatService.getMessageById(input.messageId, input.chatId);
-      
-      if (!message) {
-        throw new Error("Message not found in this chat");
-      }
-      
-      // Update active message
-      return chatService.updateChatActiveMessage(input.chatId, input.messageId);
     }),
+  }),
 });
