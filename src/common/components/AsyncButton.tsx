@@ -80,7 +80,7 @@ export const AsyncButton = ({
           className,
         )}
       >
-        {isLoading ? <LoadingOutlined /> : props.children}
+        {props.children}
       </Button>
       {/* </ConfettiBurst> */}
     </Tooltip>
