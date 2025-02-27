@@ -42,7 +42,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   return (
     <>
       <div className="mb-1 whitespace-pre-wrap">{content}</div>
-      <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+      <div className="mt-2 flex items-center justify-between text-xs text-text">
         <Space size="small">
           <Text type="secondary">
             {formatDistanceToNow(timestamp, { addSuffix: true })}
