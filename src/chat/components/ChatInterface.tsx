@@ -1,7 +1,6 @@
 "use client";
 
 import { ChangeEventHandler, useState } from "react";
-import { Button } from "@/chat/components/ui/button";
 import { Input } from "@/chat/components/ui/input";
 import {
   Card,
@@ -19,7 +18,9 @@ import { ChatProvider, useChat } from "../contexts/ChatContext";
 import ChatContainer from "./ChatContainer";
 import { useSession } from "next-auth/react";
 import { api } from "@/trpc/react";
-import { Spin, Typography } from "antd";
+import { Space, Spin, Tooltip, Typography, Button } from "antd";
+import { EditOutlined } from "@ant-design/icons";
+import { ChatTitle } from "./ChatTitle";
 
 export default function ChatInterface() {
   const { data: session } = useSession();
@@ -32,20 +33,19 @@ export default function ChatInterface() {
   
 
   return (
-    
-      <div className="flex h-full">
-        <ChatSidebar />
-        <div className="flex flex-1 flex-col">
-          <Typography.Title level={3} className="p-4 pb-2">{selectedChat?.title}</Typography.Title>
-          <div className="flex items-center justify-between border-secondary p-4 pb-2">
-            {/* <CardTitle>Chat Interface</CardTitle> */}
-            <ModelSelector />
-          </div>
-          <div className="flex-1 overflow-auto p-4 pt-2">
-            <ChatContainer />
-          </div>
+    <div className="flex h-full">
+      <ChatSidebar />
+      <div className="flex flex-1 flex-col">
+        <ChatTitle />
+        <div className="flex items-center justify-between border-secondary p-4 pb-2">
+          {/* <CardTitle>Chat Interface</CardTitle> */}
+          <ModelSelector />
         </div>
-        <AISettingsSidebar/>
+        <div className="flex-1 overflow-auto p-4 pt-2">
+          <ChatContainer />
+        </div>
       </div>
+      <AISettingsSidebar />
+    </div>
   );
 }
